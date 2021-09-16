@@ -26,7 +26,7 @@ conditions = {
     "miedo-resto": between(0, 100),
     "muerte-experiencia": between(0, 100),
     "muerte-eutanasia": between(0, 100),
-    "firstTime": lambda x: x == "true"
+    "firstTime": lambda x: x
 }
 
 def meetsConditions(obj):
