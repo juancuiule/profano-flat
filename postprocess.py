@@ -1,8 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-
-# from scipy import stats
+from scipy import stats
 
 requiredKeys = ['edad-actual', 'edad-morir', 'hijes-tenes', 'gestacion-aborto', 'gestacion-persona', 'genero-coincide', 'morir-cuerpo', 'morir-redes', 'miedo-propia', 'miedo-resto', 'muerte-experiencia', 'muerte-eutanasia', 'firstTime']
 
@@ -48,8 +47,7 @@ if __name__ == "__main__":
     
     csv = pd.DataFrame([row.values() for row in raw], columns=raw[0].keys())
     csv.to_csv('./profano.csv')
-    # csv.head()
-    
+
     plt.title("La longitud del camino")
     plt.xlabel('Edad hasta la que queremos vivir')
     plt.ylabel('Edad actual')
@@ -98,3 +96,18 @@ if __name__ == "__main__":
     plt.scatter(csv['muerte-eutanasia'], csv['muerte-experiencia'], color="#0069B4", alpha=0.4, s=4)
     plt.savefig('7.png')
     plt.clf()
+
+    BW_WIDTH = 0.2
+    f = stats.gaussian_kde(csv['genero-coincide'], BW_WIDTH)
+
+    pairs = []
+    for x in range(0, 101):
+        y = f(x)[0]
+        pairs.append([x, y])
+    pd.DataFrame(pairs).to_csv("curva-genero.csv", index=False, header=["x", "area"])
+
+    f.covariance = lambda : BW_WIDTH
+    f._compute_covariance()
+    rango = range(0, 100)
+    plt.plot(rango, f(rango))
+    plt.savefig('4.png')
