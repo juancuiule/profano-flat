@@ -54,7 +54,6 @@ if __name__ == "__main__":
     plt.ylabel('Edad actual')
     ax = plt.gca()
     ax.set_xlim([0, 130])
-    ax.set_ylim([0, 85])
     plt.scatter(csv['edad-morir'], csv['edad-actual'], color="#0069B4", alpha=0.4, s=4)
     plt.savefig('1.png')
     plt.clf()
