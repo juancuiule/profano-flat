@@ -4,10 +4,12 @@ import pandas as pd
 
 # from scipy import stats
 
-keys = ['edad-actual', 'edad-morir', 'hijes-tenes', 'hijes-gustaria', 'gestacion-aborto', 'gestacion-persona', 'genero-coincide', 'morir-cuerpo', 'morir-redes', 'miedo-propia', 'miedo-resto', 'muerte-experiencia', 'muerte-eutanasia', 'firstTime']
+requiredKeys = ['edad-actual', 'edad-morir', 'hijes-tenes', 'gestacion-aborto', 'gestacion-persona', 'genero-coincide', 'morir-cuerpo', 'morir-redes', 'miedo-propia', 'miedo-resto', 'muerte-experiencia', 'muerte-eutanasia', 'firstTime']
 
 def hasAllKeys(obj):
-    return np.all([(key in obj.keys()) for key in keys])
+    objectKeys = obj.keys()
+    hasRequiredKeys = np.all([(key in objectKeys) for key in requiredKeys])
+    hasConditionalKeys =  ('hijes-gustaria' in objectKeys) if obj['hijes-tenes'] == 0 else ('hijes-volveria' in objectKeys)
 
 def between(low, high):
     return lambda x: x >= low and x <= high
@@ -17,6 +19,7 @@ conditions = {
     "edad-morir": between(0, 130),
     "hijes-tenes": lambda value: value == "0" or value == "1",
     "hijes-gustaria": between(0, 100),
+    "hijes-volveria": between(0, 100),
     "gestacion-aborto": between(0, 42),
     "gestacion-persona": between(0, 42),
     "genero-coincide": between(0, 100),
