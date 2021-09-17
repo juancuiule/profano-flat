@@ -9,7 +9,8 @@ requiredKeys = ['edad-actual', 'edad-morir', 'hijes-tenes', 'gestacion-aborto', 
 def hasAllKeys(obj):
     objectKeys = obj.keys()
     hasRequiredKeys = np.all([(key in objectKeys) for key in requiredKeys])
-    hasConditionalKeys =  ('hijes-gustaria' in objectKeys) if obj['hijes-tenes'] == 0 else ('hijes-volveria' in objectKeys)
+    hasConditionalKeys =  ('hijes-gustaria' in objectKeys) if obj['hijes-tenes'] == "0" else ('hijes-volveria' in objectKeys)
+    return hasRequiredKeys and hasConditionalKeys
 
 def between(low, high):
     return lambda x: x >= low and x <= high
