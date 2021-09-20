@@ -4,6 +4,7 @@ import pandas as pd
 from scipy import stats
 
 requiredKeys = ['edad-actual', 'edad-morir', 'hijes-tenes', 'gestacion-aborto', 'gestacion-persona', 'genero-coincide', 'morir-cuerpo', 'morir-redes', 'miedo-propia', 'miedo-resto', 'muerte-experiencia', 'muerte-eutanasia', 'firstTime']
+optionalKeys = ['hijes-gustaria', 'hijes-volveria']
 
 def hasAllKeys(obj):
     objectKeys = obj.keys()
@@ -39,11 +40,15 @@ def meetsConditions(obj):
 if __name__ == "__main__":
     json = pd.read_json('./profano-data.json')
     
+    columns = np.concatenate((requiredKeys, optionalKeys))
     raw = np.array([])
     for x in json["data"]:
         if hasAllKeys(x):
             if meetsConditions(x):
-                raw = np.append(raw, x)
+                d = {}
+                for k in columns:
+                    d[k] = x[k] if k in x.keys() else None
+                raw = np.append(raw, d)
     
     csv = pd.DataFrame([row.values() for row in raw], columns=raw[0].keys())
     csv.to_csv('./profano.csv')
@@ -97,17 +102,49 @@ if __name__ == "__main__":
     plt.savefig('7.png')
     plt.clf()
 
+    ####
+
+    rango = range(0, 101)
+
+    ####
+
     BW_WIDTH = 0.2
     f = stats.gaussian_kde(csv['genero-coincide'], BW_WIDTH)
+    plt.plot(rango, f(rango))
+
+    plt.yticks([])
+    ax = plt.gca()
+    ax.set_ylabel('Frecuencia')
+    plt.title('Género coincide')
+    plt.savefig('4.png')
+    plt.clf()
 
     pairs = []
-    for x in range(0, 101):
+    for x in rango:
         y = f(x)[0]
         pairs.append([x, y])
     pd.DataFrame(pairs).to_csv("curva-genero.csv", index=False, header=["x", "area"])
 
-    f.covariance = lambda : BW_WIDTH
-    f._compute_covariance()
-    rango = range(0, 100)
-    plt.plot(rango, f(rango))
-    plt.savefig('4.png')
+    ######
+
+    BW_WIDTH = 0.4
+    g = stats.gaussian_kde(csv.loc[csv['hijes-tenes'] == "0"]['hijes-gustaria'], BW_WIDTH)
+    h = stats.gaussian_kde(csv.loc[csv['hijes-tenes'] == "1"]['hijes-volveria'], BW_WIDTH)
+    plt.plot(rango, h(rango))
+    plt.plot(rango, g(rango))
+
+    plt.yticks([])
+    plt.legend(["Con hijes", "Sin hijes"])
+    ax = plt.gca()
+    ax.set_xlabel('Gustaría o volvería')
+    ax.set_ylabel('Frecuencia')
+    plt.title('Hijes')
+    plt.savefig('2.png')
+    plt.clf()
+
+    pairs = []
+    for x in rango:
+        y1 = g(x)[0]
+        y2 = h(x)[0]
+        pairs.append([x, y1, y2])
+    pd.DataFrame(pairs).to_csv("curva-hijes.csv", index=False, header=["x", "gustaria", "volveria"])
